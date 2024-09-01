@@ -96,7 +96,6 @@ static void yurex_delete(struct kref *kref)
 
 	dev_dbg(&dev->interface->dev, "%s\n", __func__);
 
-	usb_put_dev(dev->udev);
 	if (dev->cntl_urb) {
 		usb_kill_urb(dev->cntl_urb);
 		kfree(dev->cntl_req);
@@ -112,6 +111,7 @@ static void yurex_delete(struct kref *kref)
 				dev->int_buffer, dev->urb->transfer_dma);
 		usb_free_urb(dev->urb);
 	}
+	usb_put_dev(dev->udev);
 	kfree(dev);
 }
 
@@ -433,7 +433,6 @@ static ssize_t yurex_read(struct file *file, char *buffer, size_t count, loff_t 
 
 	if (WARN_ON_ONCE(len >= sizeof(in_buffer)))
 		return -EIO;
-
 	return simple_read_from_buffer(buffer, count, ppos, in_buffer, len);
 }
 
