@@ -732,7 +732,7 @@ static inline u32 calc_burst_penalty(u64 burst_time) {
 }
 
 static inline u64 scale_slice(u64 delta, struct sched_entity *se) {
-	return mul_u64_u32_shr(delta, sched_prio_to_wmult[se->burst_score], 22);
+	return mul_u64_u32_shr(delta, prio_to_wmult[se->burst_score], 22);
 }
 
 static void update_burst_score(struct sched_entity *se) {
@@ -2308,9 +2308,9 @@ void reweight_task(struct task_struct *p, int prio)
 	struct sched_entity *se = &p->se;
 	struct cfs_rq *cfs_rq = cfs_rq_of(se);
 	struct load_weight *load = &se->load;
-	unsigned long weight = scale_load(sched_prio_to_weight[prio]);
+	unsigned long weight = scale_load(prio_to_weight[prio]);
 	reweight_entity(cfs_rq, se, weight);
-	load->inv_weight = sched_prio_to_wmult[prio];
+	load->inv_weight = prio_to_wmult[prio];
 }
 
 static inline int throttled_hierarchy(struct cfs_rq *cfs_rq);
@@ -7192,10 +7192,6 @@ static void yield_task_fair(struct rq *rq)
     if (curr->policy != SCHED_BATCH) {
         update_rq_clock(rq);
 
-#ifdef CONFIG_SCHED_HMP
-        if (hmp_aggressive_yield && cfs_rq->curr)
-            cfs_rq->curr->exec_start -= YIELD_CORRECTION_TIME;
-#endif
         /*
          * Update run-time statistics of the 'current'.
          */
@@ -7210,7 +7206,7 @@ static void yield_task_fair(struct rq *rq)
      * so we don't do microscopic update in schedule()
      * and double the fastpath cost.
      */
-    rq_clock_skip_update(rq, true);
+    rq->skip_clock_update = 1;
     set_skip_buddy(se);
 }
 
@@ -10249,7 +10245,6 @@ static void task_fork_fair(struct task_struct *p)
 
 	if (curr)
 		se->vruntime = curr->vruntime;
-	}
 #ifdef CONFIG_SCHED_BORE
 	update_burst_score(se);
 #endif // CONFIG_SCHED_BORE
