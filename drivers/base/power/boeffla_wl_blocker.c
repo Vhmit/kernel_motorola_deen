@@ -49,6 +49,7 @@ extern char list_wl_search[LENGTH_LIST_WL_SEARCH];
 extern bool wl_blocker_active;
 extern bool wl_blocker_debug;
 
+
 /*****************************************/
 // internal functions
 /*****************************************/
@@ -65,6 +66,7 @@ static void build_search_string(char *list1, char *list2)
 		wl_blocker_active = false;
 }
 
+
 /*****************************************/
 // sysfs interface functions
 /*****************************************/
@@ -78,6 +80,7 @@ static ssize_t wakelock_blocker_show(struct device *dev, struct device_attribute
 }
 
 
+// store list of user configured wakelocks
 static ssize_t wakelock_blocker_store(struct device * dev, struct device_attribute *attr,
 			     const char * buf, size_t n)
 {
@@ -88,8 +91,8 @@ static ssize_t wakelock_blocker_store(struct device * dev, struct device_attribu
 		return -EINVAL;
 
 	// store user configured wakelock list and rebuild search string
-    sscanf(buf, "%s", list_wl);
-    build_search_string(list_wl_default, list_wl);
+	sscanf(buf, "%s", list_wl);
+	build_search_string(list_wl_default, list_wl);
 
 	return n;
 }
@@ -117,18 +120,21 @@ static ssize_t wakelock_blocker_default_store(struct device * dev, struct device
 	// store default, predefined wakelock list and rebuild search string
 	sscanf(buf, "%s", list_wl_default);
 	build_search_string(list_wl_default, list_wl);
-	
-    return n;
+
+	return n;
 }
 
 
+// show debug information of driver internals
 static ssize_t debug_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	// return current debug status
-    return sprintf(buf, "Debug status: %d\n\nUser list: %s\nDefault list: %s\nSearch list: %s\nActive: %d\n",
-					wl_blocker_debug, list_wl, list_wl_default, list_wl_search, wl_blocker_active);}
+	return sprintf(buf, "Debug status: %d\n\nUser list: %s\nDefault list: %s\nSearch list: %s\nActive: %d\n",
+					wl_blocker_debug, list_wl, list_wl_default, list_wl_search, wl_blocker_active);
+}
 
 
+// store debug mode on/off (1/0)
 static ssize_t debug_store(struct device *dev, struct device_attribute *attr,
 						const char *buf, size_t count)
 {
@@ -149,7 +155,7 @@ static ssize_t debug_store(struct device *dev, struct device_attribute *attr,
 	return count;
 }
 
-// store debug mode on/off (1/0)
+
 static ssize_t version_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	// return version information
@@ -171,7 +177,7 @@ static DEVICE_ATTR(version, 0664, version_show, NULL);
 // define attributes
 static struct attribute *boeffla_wl_blocker_attributes[] = {
 	&dev_attr_wakelock_blocker.attr,
-    &dev_attr_wakelock_blocker_default.attr,
+	&dev_attr_wakelock_blocker_default.attr,
 	&dev_attr_debug.attr,
 	&dev_attr_version.attr,
 	NULL
@@ -203,7 +209,7 @@ static int boeffla_wl_blocker_init(void)
 		return 0;
 	}
 
-    // initialize default list
+	// initialize default list
 	sprintf(list_wl_default, "%s", LIST_WL_DEFAULT);
 	build_search_string(list_wl_default, list_wl);
 

@@ -471,7 +471,8 @@ static bool check_for_block(struct wakeup_source *ws)
 	{
 		// wake lock names handled have maximum length=50 and minimum=1
 		length = strlen(ws->name);
-		if ((length > 50) || (length < 1))			return false;
+		if ((length > 50) || (length < 1))
+			return false;
 
 		// check if wakelock is in wake lock list to be blocked
 		sprintf(wakelock_name, ";%s;", ws->name);
